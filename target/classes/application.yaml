@@ -1,0 +1,11 @@
+server:
+  port: 85
+  servlet:
+    context-path: /newbeemall
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+#    cache: false
+#    encoding: UTF-8
