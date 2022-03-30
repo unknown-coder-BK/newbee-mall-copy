@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.newbee.mall.constant.Constants;
 import ltd.newbee.mall.core.entity.MallUser;
+import ltd.newbee.mall.core.entity.dto.MallUserDTO;
 import ltd.newbee.mall.core.service.MallUserService;
+import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,19 +36,30 @@ public class MallUserController {
 
     @ResponseBody
     @PostMapping("register")
-    public R register(@RequestParam("loginName") String loginName,
-                      @RequestParam("verifyCode") String verifyCode,
-                      @RequestParam("password") String password,
+    public R register(@RequestBody MallUserDTO mallUserDTO,
                       HttpSession session) {
+        String verifyCode = mallUserDTO.getVerifyCode();
+        String loginName = mallUserDTO.getLoginName();
+        String password = mallUserDTO.getPassword();
         String kaptchaCode = (String) session.getAttribute(Constants.MALL_VERIFY_CODE_KEY);
         if (!StringUtils.equalsIgnoreCase(verifyCode, kaptchaCode)) {
             return R.error("验证码错误");
         }
+        checkRegister(mallUserDTO);
         List<MallUser> list = mallUserService.list(Wrappers.<MallUser>lambdaQuery()
                 .eq(MallUser::getLoginName, loginName).last("limit 1"));
         if (CollectionUtils.isNotEmpty(list)) {
             return R.error("该账户名已存在");
         }
         return R.result(mallUserService.register(loginName, password));
+    }
+
+    public void checkRegister(MallUserDTO mallUserDTO){
+        if(StringUtils.isEmpty(mallUserDTO.getLoginName())){
+            throw new BusinessException("手机号为空");
+        }
+        if(StringUtils.isEmpty(mallUserDTO.getPassword())){
+            throw new BusinessException("密码为空");
+        }
     }
 }
