@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.newbee.mall.controller.base.BaseController;
 import ltd.newbee.mall.util.R;
 import ltd.newbee.mall.util.http.HttpUtil;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.BindException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,5 +38,11 @@ public class GlobalExceptionAdvice {
         Map<String, Object> map = new HashMap<>();
         map.put("msg", e.getMessage());
         return new ModelAndView("error/500", map);
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public Object handleBindException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        System.out.println(e);
+        return R.error(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 }

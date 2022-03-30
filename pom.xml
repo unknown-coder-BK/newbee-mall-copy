@@ -75,6 +75,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
 
+        <!-- 校验 -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.1.7.Final</version>
+        </dependency>
+<!--        &lt;!&ndash;el 规范和tomcat的实现，用于解析错误提示信息messages里面的表达式&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.tomcat.embed</groupId>-->
+<!--            <artifactId>tomcat-embed-el</artifactId>-->
+<!--            <version>9.0.52</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 </project>

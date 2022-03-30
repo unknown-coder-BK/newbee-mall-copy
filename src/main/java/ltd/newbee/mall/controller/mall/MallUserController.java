@@ -11,6 +11,7 @@ import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
 
@@ -36,7 +37,7 @@ public class MallUserController {
 
     @ResponseBody
     @PostMapping("register")
-    public R register(@RequestBody MallUserDTO mallUserDTO,
+    public R register(@RequestBody  @Validated(value = {MallUserDTO.Register.class}) MallUserDTO mallUserDTO,
                       HttpSession session) {
         String verifyCode = mallUserDTO.getVerifyCode();
         String loginName = mallUserDTO.getLoginName();
