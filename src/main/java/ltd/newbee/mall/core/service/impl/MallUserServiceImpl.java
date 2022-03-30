@@ -13,11 +13,13 @@ import ltd.newbee.mall.core.service.MallUserService;
 import ltd.newbee.mall.util.security.Md5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class MallUserServiceImpl extends ServiceImpl<MallUserDao, MallUser> implements MallUserService {
@@ -28,6 +30,7 @@ public class MallUserServiceImpl extends ServiceImpl<MallUserDao, MallUser> impl
     private CouponUserService couponUserService;
 
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean register(String loginName, String password) {
         MallUser mallUser = new MallUser();
@@ -39,13 +42,15 @@ public class MallUserServiceImpl extends ServiceImpl<MallUserDao, MallUser> impl
         }
         List<Coupon> coupons = couponService.list(Wrappers.<Coupon>lambdaQuery()
                 .eq(Coupon::getCouponType, 1));
-        coupons.stream().map(coupon ->{
+        List<CouponUser> couponUserList = coupons.stream().map(coupon -> {
             CouponUser couponUser = new CouponUser();
             couponUser.setUserId(mallUser.getUserId());
             couponUser.setCouponId(coupon.getCouponId());
             Date endDate = couponUserService.calculateEndDate(coupon.getDays());
-            return null;
-        });
-        return false;
+            couponUser.setStartTime(new Date());
+            couponUser.setEndTime(endDate);
+            return couponUser;
+        }).collect(Collectors.toList());
+        return couponUserService.saveBatch(couponUserList);
     }
 }
