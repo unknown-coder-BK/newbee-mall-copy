@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>NewBee商城-登录</title>
+  <script th:inline="javascript">var _ctx = [[@{/}]];</script>
 </head>
 <body>
   <div class="form center">
@@ -11,11 +12,94 @@
         <div class="login_top">
           <div class="left fl">会员登录</div>
           <div class="right fr">您还不是我们的会员？<a th:href="@{/register}">立即注册</a></div>
-          <div class="clear"></div>
-          <div class="under-line center"></div>
         </div>
+        <form id="loginForm">
+          <div class="login_main center">
+            <div class="login-info">手机号:&nbsp;
+              <input class="login-info-input"
+                     name="loginName"
+                     placeholder="请输入你的手机号"
+              />
+            </div>
+            <div class="login-info">密码:&nbsp;
+              <input class="login-info-input"
+                     name="password"
+                     placeholder="请输入你的密码"/>
+            </div>
+            <div class="login-info">验证码:&nbsp;
+              <input class="login-info-input verify-code"
+                     name="verifyCode"
+                     placeholder="请输入验证码"/>
+              <img alt="单击图片刷新" th:src="@{/common/captcha}"
+                   th:onclick="this.src=_ctx + 'common/captcha?d='+new Date()*1">
+            </div>
+            <div class="login_submit">
+              <input class="submit" type="button" onclick="login()" value="立即登录">
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </body>
+
+<script th:src="@{/admin/plugins/jquery/jquery.min.js}"></script>
+<script th:src="@{/admin/plugins/sweetalert/sweetalert.min.js}"></script>
+<script type="text/javascript">
+  function login() {
+    var params = JSON.stringify($("#loginForm").serializeJson());
+    var url = _ctx + 'login?destPath='
+    // 添加目标地址
+    var destPath = window.location.href.split('?')[1];
+    if (destPath) {
+      url = url + destPath;
+    }
+    $.ajax({
+      type: 'POST',//方法类型
+      url: url,
+      data:params,
+      contentType: 'application/json',
+      success: function (result) {
+        if (result.code == 200) {
+          if (result.map.destPath) {
+            window.location.href = _ctx + result.map.destPath;
+          } else {
+            window.location.href = _ctx + 'index';
+          }
+        }else {
+          swal(result.msg, {
+            icon: "error",
+          });
+        }
+      },
+      error: function () {
+        swal("操作失败", {
+          icon: "error",
+        });
+      }
+    });
+  }
+
+  (function(window, $) {
+    $.fn.serializeJson = function() {
+      var serializeObj = {};
+      var array = this.serializeArray();
+      var str = this.serialize();
+      $(array).each(
+              function() {
+                if (serializeObj[this.name]) {
+                  if ($.isArray(serializeObj[this.name])) {
+                    serializeObj[this.name].push(this.value);
+                  } else {
+                    serializeObj[this.name] = [
+                      serializeObj[this.name], this.value ];
+                  }
+                } else {
+                  serializeObj[this.name] = this.value;
+                }
+              });
+      return serializeObj;
+    };
+  })(window, jQuery);
+</script>
 </html>

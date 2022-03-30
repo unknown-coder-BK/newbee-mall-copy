@@ -33,6 +33,11 @@ public class R implements Serializable {
             return result ? success() : error();
     }
 
+    public R add(String key, Object value) {
+        map.put(key, value);
+        return this;
+    }
+
 
 
 

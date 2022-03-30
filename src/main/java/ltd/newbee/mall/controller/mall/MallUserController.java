@@ -1,20 +1,22 @@
 package ltd.newbee.mall.controller.mall;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import ltd.newbee.mall.constant.Constants;
 import ltd.newbee.mall.core.entity.MallUser;
 import ltd.newbee.mall.core.entity.dto.MallUserDTO;
+import ltd.newbee.mall.core.entity.vo.MallUserVO;
 import ltd.newbee.mall.core.service.MallUserService;
-import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.util.R;
+import ltd.newbee.mall.util.security.Md5Utils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -23,12 +25,6 @@ import java.util.List;
 public class MallUserController {
     @Autowired
     private MallUserService mallUserService;
-//    @GetMapping("login")
-//    public String logout(HttpSession httpSession) {
-//        httpSession.removeAttribute(MALL_USER_SESSION_KEY);
-//        return "mall/login";
-//    }
-
 
     @GetMapping("register")
     public String registerPage() {
@@ -46,7 +42,6 @@ public class MallUserController {
         if (!StringUtils.equalsIgnoreCase(verifyCode, kaptchaCode)) {
             return R.error("验证码错误");
         }
-        checkRegister(mallUserDTO);
         List<MallUser> list = mallUserService.list(Wrappers.<MallUser>lambdaQuery()
                 .eq(MallUser::getLoginName, loginName).last("limit 1"));
         if (CollectionUtils.isNotEmpty(list)) {
@@ -55,12 +50,43 @@ public class MallUserController {
         return R.result(mallUserService.register(loginName, password));
     }
 
-    public void checkRegister(MallUserDTO mallUserDTO){
-        if(StringUtils.isEmpty(mallUserDTO.getLoginName())){
-            throw new BusinessException("手机号为空");
+
+    @GetMapping("/login")
+    public String loginPage(HttpServletRequest request) {
+        return "mall/login";
+    }
+
+    @ResponseBody
+    @PostMapping("/login")
+    public R doLogin(@RequestBody @Validated(value = {MallUserDTO.Login.class}) MallUserDTO mallUserDTO,
+                     @RequestParam("destPath") String destPath,
+                     HttpSession session) {
+        R success = R.success();
+        String loginName = mallUserDTO.getLoginName();
+        String password = mallUserDTO.getPassword();
+        String verifyCode = mallUserDTO.getVerifyCode();
+        String kaptchaCode = (String) session.getAttribute(Constants.MALL_VERIFY_CODE_KEY);
+        if (!StringUtils.equalsIgnoreCase(verifyCode, kaptchaCode)) {
+            return R.error("验证码错误");
         }
-        if(StringUtils.isEmpty(mallUserDTO.getPassword())){
-            throw new BusinessException("密码为空");
+
+        List<MallUser> list = mallUserService.list(Wrappers.<MallUser>lambdaQuery()
+                .eq(MallUser::getLoginName,loginName)
+                .eq(MallUser::getPasswordMd5, Md5Utils.hash(password)).last("limit 1")
+        );
+        if (CollectionUtils.isEmpty(list)) {
+            return R.error("账户名称或者密码错误");
         }
+        MallUser user = list.get(0);
+        if (user.getLockedFlag() == 1) {
+            return R.error("该账户已被禁用");
+        }
+        MallUserVO mallUserVO = new MallUserVO();
+        BeanUtils.copyProperties(user, mallUserVO);
+        session.setAttribute(Constants.MALL_USER_SESSION_KEY, mallUserVO);
+        if (StringUtils.isNotEmpty(destPath) && StringUtils.contains(destPath, "=")) {
+            success.add("destPath", destPath.split("=")[1].substring(1));
+        }
+        return success;
     }
 }
