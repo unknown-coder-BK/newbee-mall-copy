@@ -1,0 +1,12 @@
+server:
+  port: 85
+  servlet:
+    context-path: /newbeemall
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+  profiles:
+    active: dev
+
