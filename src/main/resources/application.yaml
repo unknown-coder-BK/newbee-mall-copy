@@ -7,5 +7,6 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
-    cache: false
-    encoding: UTF-8
+  profiles:
+    active: dev
+
