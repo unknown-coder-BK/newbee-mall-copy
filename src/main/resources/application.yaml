@@ -10,3 +10,5 @@ spring:
   profiles:
     active: dev
 
+local:
+  uploadDir: D:\\upload
