@@ -21,6 +21,7 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -49,11 +50,11 @@ public class MallSeckillController extends BaseController {
     public String list(HttpServletRequest request,
                        HttpServletResponse response,
                        Model model) {
-        // 判断缓存中是否有当前秒杀商品列表页面
+        // 判断缓存中是否有当前秒杀商品列表页面,以免每次都去获取列表
         String html = redisCache.getCacheObject(Constants.SECKILL_GOODS_LIST_HTML);
-//        if (StringUtils.isNotBlank(html)) {
-//            return html;
-//        }
+        if (StringUtils.isNotBlank(html)) {
+            return html;
+        }
         List<Seckill> seckillList = seckillService.list(
                 new QueryWrapper<Seckill>().eq("status", 1).orderByDesc("seckill_rank"));
         List<Map<String, Object>> list = seckillList.stream().map(seckill -> {
@@ -70,8 +71,7 @@ public class MallSeckillController extends BaseController {
         }).collect(Collectors.toList());
         request.setAttribute("seckillList", list);
         // 缓存秒杀商品列表页
-        WebContext ctx = new WebContext(request, response,
-                request.getServletContext(), request.getLocale(), model.asMap());
+        WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
         html = thymeleafViewResolver.getTemplateEngine().process("mall/seckill-list", ctx);
         if (!StringUtils.isEmpty(html)) {
             redisCache.setCacheObject(Constants.SECKILL_GOODS_LIST_HTML, html, 100, TimeUnit.HOURS);
@@ -79,4 +79,57 @@ public class MallSeckillController extends BaseController {
         return html;
     }
 
+    @GetMapping("detail/{seckillId}")
+    @ResponseBody
+    public String detail(@PathVariable("seckillId") Long seckillId,
+                         HttpServletRequest request,
+                         HttpServletResponse response,
+                         Model model) {
+        // 判断缓存中是否有当前秒杀商品详情页面
+        String html = redisCache.getCacheObject(Constants.SECKILL_GOODS_DETAIL_HTML + seckillId);
+//        if (StringUtils.isNotBlank(html)) {
+//            return html;
+//        }
+        Seckill seckill = seckillService.getById(seckillId);
+        Long goodsId = seckill.getGoodsId();
+        Map<String, Object> map = new HashMap<>();
+        map.put("goodsId", goodsId);
+        map.put("seckillPrice", seckill.getSeckillPrice());
+        map.put("startDate", seckill.getSeckillBegin().getTime());
+        map.put("endDate", seckill.getSeckillEnd().getTime());
+        Goods goods = goodsService.getById(seckill.getGoodsId());
+        map.put("goodsName", goods.getGoodsName());
+        map.put("originalPrice", goods.getOriginalPrice());
+        map.put("goodsCoverImg", goods.getGoodsCoverImg());
+        map.put("goodsIntro", goods.getGoodsIntro());
+        map.put("goodsDetailContent", goods.getGoodsDetailContent());
+        long now = System.currentTimeMillis();
+        //秒杀商品开始时间
+        long startAt = seckill.getSeckillBegin().getTime();
+        //秒杀商品结束时间
+        long endAt = seckill.getSeckillEnd().getTime();
+        int miaoshaStatus;
+        int remainSeconds;
+        if (now < startAt) {// 秒杀还没开始，倒计时(秒)
+            miaoshaStatus = 0;
+            remainSeconds = (int) ((startAt - now) / 1000);
+        } else if (now > endAt) {// 秒杀已经结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        } else {// 秒杀进行中
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+        request.setAttribute("goodsDetail", map);
+        request.setAttribute("seckillId", seckill.getSeckillId());
+        request.setAttribute("seckillStatus", miaoshaStatus);
+        request.setAttribute("remainSeconds", remainSeconds);
+        // 缓存秒杀商品详情页
+        WebContext ctx = new WebContext(request, response, request.getServletContext(), request.getLocale(), model.asMap());
+        html = thymeleafViewResolver.getTemplateEngine().process("mall/seckill-detail", ctx);
+        if (!StringUtils.isEmpty(html)) {
+            redisCache.setCacheObject(Constants.SECKILL_GOODS_DETAIL_HTML + seckillId, html, 30, TimeUnit.MINUTES);
+        }
+        return html;
+    }
 }

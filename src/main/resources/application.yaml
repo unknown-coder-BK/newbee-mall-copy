@@ -12,3 +12,7 @@ spring:
 
 local:
   uploadDir: D:\\upload
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -69,7 +69,6 @@ public class MallUserController {
         if (!StringUtils.equalsIgnoreCase(verifyCode, kaptchaCode)) {
             return R.error("验证码错误");
         }
-
         List<MallUser> list = mallUserService.list(Wrappers.<MallUser>lambdaQuery()
                 .eq(MallUser::getLoginName,loginName)
                 .eq(MallUser::getPasswordMd5, Md5Utils.hash(password)).last("limit 1")
