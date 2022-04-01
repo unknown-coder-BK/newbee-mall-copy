@@ -35,6 +35,10 @@ public class Constants {
      */
     public static final String SECKILL_GOODS_DETAIL_HTML = "seckill_goods_detail_html:";
 
+    /**
+     * 秒杀商品缓存
+     */
+    public static final String SECKILL_KEY = "seckill:";
 
 
 }

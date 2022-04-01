@@ -6,6 +6,7 @@ import ltd.newbee.mall.constant.Constants;
 import ltd.newbee.mall.controller.base.BaseController;
 import ltd.newbee.mall.core.entity.Goods;
 import ltd.newbee.mall.core.entity.Seckill;
+import ltd.newbee.mall.core.entity.vo.ExposerVO;
 import ltd.newbee.mall.core.service.GoodsService;
 import ltd.newbee.mall.core.service.SeckillService;
 import ltd.newbee.mall.redis.RedisCache;
@@ -138,10 +139,10 @@ public class MallSeckillController extends BaseController {
         return R.success().add("now", new Date().getTime());
     }
 
-//    @ResponseBody
-//    @PostMapping("{seckillId}/exposer")
-//    public R exposerUrl(@PathVariable Long seckillId) {
-//        ExposerVO exposerVO = seckillService.exposerUrl(seckillId);
-//        return R.success().add("exposer", exposerVO);
-//    }
+    @ResponseBody
+    @PostMapping("{seckillId}/exposer")
+    public R exposerUrl(@PathVariable Long seckillId) {
+        ExposerVO exposerVO = seckillService.exposerUrl(seckillId);
+        return R.success().add("exposer", exposerVO);
+    }
 }
