@@ -46,20 +46,22 @@ public class WebConfig implements WebMvcConfigurer {
                   .excludePathPatterns("/login")
                   .excludePathPatterns("/common/**")
                   .excludePathPatterns("/admin/**")
-                  .excludePathPatterns("/goods-img/**");
+                  .excludePathPatterns("/goods-img/**")
+                  .excludePathPatterns("/mall/**")
+                  .excludePathPatterns("/seckill/list")
+                  .excludePathPatterns("/seckill/detail/*")
+                  .excludePathPatterns("/seckill/time/now");
 //                .excludePathPatterns("/login")
 //                .excludePathPatterns("/logout")
 //                .excludePathPatterns("/register")
 //                .excludePathPatterns("/index")
-//                .excludePathPatterns("/seckill/list")
 //                .excludePathPatterns("/search")
 //                .excludePathPatterns("/goods/**")
 //                .excludePathPatterns("/shopCart/getUserShopCartCount")
 //                .excludePathPatterns("/seckill/detail/*")
-//                .excludePathPatterns("/seckill/time/now")
 //                .excludePathPatterns("/seckill/*/exposer")
 //                .excludePathPatterns("/upload/**")
-//                .excludePathPatterns("/mall/**")
+
 
 
 

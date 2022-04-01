@@ -9,14 +9,12 @@ import ltd.newbee.mall.core.entity.Seckill;
 import ltd.newbee.mall.core.service.GoodsService;
 import ltd.newbee.mall.core.service.SeckillService;
 import ltd.newbee.mall.redis.RedisCache;
+import ltd.newbee.mall.util.R;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
@@ -24,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,4 +131,17 @@ public class MallSeckillController extends BaseController {
         }
         return html;
     }
+
+    @ResponseBody
+    @GetMapping("time/now")
+    public R getTimeNow() {
+        return R.success().add("now", new Date().getTime());
+    }
+
+//    @ResponseBody
+//    @PostMapping("{seckillId}/exposer")
+//    public R exposerUrl(@PathVariable Long seckillId) {
+//        ExposerVO exposerVO = seckillService.exposerUrl(seckillId);
+//        return R.success().add("exposer", exposerVO);
+//    }
 }

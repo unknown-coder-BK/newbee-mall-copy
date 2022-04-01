@@ -1,7 +1,7 @@
 // 存放主要交换逻辑js代码
 // javascript 模块化
 var seckill = {
-    // 封装秒杀相关ajax的url
+    // // 封装秒杀相关ajax的url
     URL: {
         basePath: function () {
             return _ctx;
@@ -12,13 +12,15 @@ var seckill = {
         exposer: function (seckillId) {
             return seckill.URL.basePath() + 'seckill/' + seckillId + '/exposer';
         },
-        execution: function (seckillId, md5) {
-            return seckill.URL.basePath() + 'seckill/' + seckillId + '/' + md5 + '/execution';
-        },
-        settle: function (seckillSuccessId, md5) {
-            return seckill.URL.basePath() + 'seckill/' + seckillSuccessId + '/' + md5 + '/settle';
-        }
+        // execution: function (seckillId, md5) {
+        //     return seckill.URL.basePath() + 'seckill/' + seckillId + '/' + md5 + '/execution';
+        // },
+        // settle: function (seckillSuccessId, md5) {
+        //     return seckill.URL.basePath() + 'seckill/' + seckillSuccessId + '/' + md5 + '/settle';
+        // }
     },
+
+
     // 处理秒杀逻辑
     handleSeckill: function (seckillId, node) {
         // 获取秒杀地址，控制显示逻辑，执行秒杀
@@ -68,6 +70,7 @@ var seckill = {
             }
         });
     },
+
     // 倒计时
     countdown: function (seckillId, nowTime, startTime, endTime) {
         // 时间判断
@@ -92,14 +95,11 @@ var seckill = {
             seckill.handleSeckill(seckillId, seckillBox);
         }
     },
+
     // 详情页秒杀逻辑
     detail: {
         // 详情页初始化
         init: function (params) {
-            // 规划我们的交互流程
-            var startTime = params['startTime'];
-            var endTime = params['endTime'];
-            var seckillId = params['seckillId'];
             // 计时交互
             var startTime = params['startTime'];
             var endTime = params['endTime'];
