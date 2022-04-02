@@ -1,6 +1,7 @@
 package ltd.newbee.mall.config.properties;
 
 import ltd.newbee.mall.interceptor.MallLoginValidateInterceptor;
+import ltd.newbee.mall.interceptor.RepeatSubmitInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -8,14 +9,16 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     @Value("${local.uploadDir}")
     private String uploadDir;
 
-//    @Resource
-//    private RepeatSubmitInterceptor repeatSubmitInterceptor;
+    @Resource
+    private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
 ////    @Value("${wayn.viewModel}")
 ////    private boolean viewModel;
@@ -51,7 +54,10 @@ public class WebConfig implements WebMvcConfigurer {
                   .excludePathPatterns("/seckill/list")
                   .excludePathPatterns("/seckill/detail/*")
                   .excludePathPatterns("/seckill/time/now")
+                  //是否进行秒杀接口
                   .excludePathPatterns("/seckill/*/exposer");
+//                  .excludePathPatterns("/error");
+
 //                .excludePathPatterns("/login")
 //                .excludePathPatterns("/logout")
 //                .excludePathPatterns("/register")
@@ -60,7 +66,6 @@ public class WebConfig implements WebMvcConfigurer {
 //                .excludePathPatterns("/goods/**")
 //                .excludePathPatterns("/shopCart/getUserShopCartCount")
 //                .excludePathPatterns("/seckill/detail/*")
-
 //                .excludePathPatterns("/upload/**")
 
 
@@ -74,8 +79,8 @@ public class WebConfig implements WebMvcConfigurer {
 //                .excludePathPatterns("/admin/plugins/**");
 //
 
-//        registry.addInterceptor(repeatSubmitInterceptor)
-//                .addPathPatterns("/**");
+        registry.addInterceptor(repeatSubmitInterceptor)
+                .addPathPatterns("/**");
 //
 //        registry.addInterceptor(new AdminViewModelInterceptor(viewModel))
 //                .addPathPatterns("/admin/**")

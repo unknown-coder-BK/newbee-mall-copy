@@ -2,15 +2,20 @@ package ltd.newbee.mall.controller.mall;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import ltd.newbee.mall.annotation.RepeatSubmit;
 import ltd.newbee.mall.constant.Constants;
 import ltd.newbee.mall.controller.base.BaseController;
 import ltd.newbee.mall.core.entity.Goods;
 import ltd.newbee.mall.core.entity.Seckill;
 import ltd.newbee.mall.core.entity.vo.ExposerVO;
+import ltd.newbee.mall.core.entity.vo.MallUserVO;
+import ltd.newbee.mall.core.entity.vo.SeckillSuccessVO;
 import ltd.newbee.mall.core.service.GoodsService;
 import ltd.newbee.mall.core.service.SeckillService;
+import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.redis.RedisCache;
 import ltd.newbee.mall.util.R;
+import ltd.newbee.mall.util.security.Md5Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,9 +25,9 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -144,5 +149,20 @@ public class MallSeckillController extends BaseController {
     public R exposerUrl(@PathVariable Long seckillId) {
         ExposerVO exposerVO = seckillService.exposerUrl(seckillId);
         return R.success().add("exposer", exposerVO);
+    }
+
+    @ResponseBody
+    @RepeatSubmit // 接口防重复提交注解
+    // 接口限流注解
+    @PostMapping(value = "/{seckillId}/{md5}/execution")
+    public R execute(@PathVariable Long seckillId,
+                     @PathVariable String md5, HttpSession session) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
+        if (md5 == null || !md5.equals(Md5Utils.hash(seckillId))) {
+            throw new BusinessException("秒杀商品不存在");
+        }
+        MallUserVO userVO = (MallUserVO) session.getAttribute(Constants.MALL_USER_SESSION_KEY);
+        SeckillSuccessVO seckillSuccessVO = seckillService.executeSeckillFinal(seckillId, userVO);
+        return R.success().add("seckillSuccess", seckillSuccessVO);
     }
 }

@@ -12,9 +12,9 @@ var seckill = {
         exposer: function (seckillId) {
             return seckill.URL.basePath() + 'seckill/' + seckillId + '/exposer';
         },
-        // execution: function (seckillId, md5) {
-        //     return seckill.URL.basePath() + 'seckill/' + seckillId + '/' + md5 + '/execution';
-        // },
+        execution: function (seckillId, md5) {
+            return seckill.URL.basePath() + 'seckill/' + seckillId + '/' + md5 + '/execution';
+        },
         // settle: function (seckillSuccessId, md5) {
         //     return seckill.URL.basePath() + 'seckill/' + seckillSuccessId + '/' + md5 + '/settle';
         // }
@@ -36,10 +36,10 @@ var seckill = {
                     var md5 = exposer['md5'];
                     var killUrl = seckill.URL.execution(seckillId, md5);
                     console.log('killUrl=' + killUrl);
-                    $('#killBtn').one('click', function () {
+                    $('#killBtn').on('click', function () {
                         // 执行秒杀请求
                         // 1.先禁用按钮
-                        $(this).addClass('disabled');
+                        // $(this).addClass('disabled');
                         // 2.发送秒杀请求
                         $.post(killUrl, {}, function (result) {
                             if (result['code'] == 200) {

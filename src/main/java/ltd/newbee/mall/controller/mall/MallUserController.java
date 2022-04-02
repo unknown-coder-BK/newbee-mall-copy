@@ -7,7 +7,9 @@ import ltd.newbee.mall.core.entity.MallUser;
 import ltd.newbee.mall.core.entity.dto.MallUserDTO;
 import ltd.newbee.mall.core.entity.vo.MallUserVO;
 import ltd.newbee.mall.core.service.MallUserService;
+import ltd.newbee.mall.exception.BusinessException;
 import ltd.newbee.mall.util.R;
+import ltd.newbee.mall.util.http.HttpUtil;
 import ltd.newbee.mall.util.security.Md5Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -53,6 +55,9 @@ public class MallUserController {
 
     @GetMapping("/login")
     public String loginPage(HttpServletRequest request) {
+        if (HttpUtil.isAjax(request)) {
+            throw new BusinessException("请先登陆！");
+        }
         return "mall/login";
     }
 

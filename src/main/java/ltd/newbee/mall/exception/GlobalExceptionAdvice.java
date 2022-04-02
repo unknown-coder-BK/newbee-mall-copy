@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import ltd.newbee.mall.util.R;
 import ltd.newbee.mall.util.http.HttpUtil;
 import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
@@ -59,7 +58,7 @@ public class GlobalExceptionAdvice {
         if (HttpUtil.isAjax(request)) {
             return R.error("您请求路径不存在，请检查url！");
         }
-        return new ModelAndView("error/404");
+        return new ModelAndView("404");
     }
 
 
