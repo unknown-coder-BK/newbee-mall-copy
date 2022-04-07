@@ -157,7 +157,7 @@ public class MallSeckillController extends BaseController {
     @PostMapping(value = "/{seckillId}/{md5}/execution")
     public R execute(@PathVariable Long seckillId,
                      @PathVariable String md5, HttpSession session) throws InterruptedException {
-        TimeUnit.SECONDS.sleep(5);
+//        TimeUnit.SECONDS.sleep(5);
         if (md5 == null || !md5.equals(Md5Utils.hash(seckillId))) {
             throw new BusinessException("秒杀商品不存在");
         }

@@ -2,6 +2,7 @@ package ltd.newbee.mall.config.properties;
 
 import ltd.newbee.mall.interceptor.MallLoginValidateInterceptor;
 import ltd.newbee.mall.interceptor.RepeatSubmitInterceptor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -18,6 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     private String uploadDir;
 
     @Resource
+    @Qualifier("sameUrlData")
     private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
 ////    @Value("${wayn.viewModel}")
@@ -55,7 +57,8 @@ public class WebConfig implements WebMvcConfigurer {
                   .excludePathPatterns("/seckill/detail/*")
                   .excludePathPatterns("/seckill/time/now")
                   //是否进行秒杀接口
-                  .excludePathPatterns("/seckill/*/exposer");
+                  .excludePathPatterns("/seckill/*/exposer")
+                  .excludePathPatterns("/seckill/**/execution");
 //                  .excludePathPatterns("/error");
 
 //                .excludePathPatterns("/login")

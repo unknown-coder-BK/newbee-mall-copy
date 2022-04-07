@@ -26,7 +26,7 @@
     </properties>
 
     <dependencies>
-        <!--1 web启动类@SpringBootApplication注解需要使用这个依赖启动web项目 -->
+        <!--1 启动类@SpringBootApplication注解需要使用这个依赖启动web项目 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
